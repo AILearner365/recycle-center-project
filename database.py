@@ -1,6 +1,9 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, Date, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, MetaData, text
+from sqlalchemy.orm import sessionmaker, relationship, declarative_base
+
+
+# Create the database engine
+engine = create_engine('sqlite:///recycle_center.db', connect_args={'timeout': 30})
 
 # Define the base for the models
 Base = declarative_base()
@@ -18,22 +21,11 @@ class WasteRecord(Base):
     __tablename__ = 'waste_records_new'
     id = Column(Integer, primary_key=True)
     date_collected = Column(Date, nullable=False)
-    food_compost = Column(Float)
-    food_noncompost = Column(Float)
-    cardboard = Column(Float)
-    paper_mixed = Column(Float)
-    paper_newspaper = Column(Float)
-    paper_white = Column(Float)
-    plastic_pet = Column(Float)
-    plastic_natural = Column(Float)
-    plastic_colored = Column(Float)
-    aluminum = Column(Float)
-    metal_other = Column(Float)
-    glass = Column(Float)
     user_id = Column(Integer, ForeignKey('users.id'))
 
     # Relationship to the User model
     user = relationship("User", back_populates="waste_records_new")
+
 
 # Category model
 class Category(Base):
@@ -49,12 +41,24 @@ class Category(Base):
 # Define the relationship between User and WasteRecord
 User.waste_records_new = relationship("WasteRecord", order_by=WasteRecord.id, back_populates="user")
 
-# Create the database engine
-engine = create_engine('sqlite:///recycle_center.db')
-
 # Create all tables
 Base.metadata.create_all(engine)
+
 
 # Create the session for interacting with the database
 Session = sessionmaker(bind=engine)
 session = Session()
+
+def add_new_column(session, column_name):
+    # Reflect the existing database schema
+    metadata = MetaData()
+    metadata.reflect(bind=engine)
+    waste_records_table = metadata.tables['waste_records_new']
+
+    # Check if the column already exists to avoid duplication
+    if column_name not in waste_records_table.columns:
+        # Add the new column with a default value of 0
+        session.execute(text(f'ALTER TABLE waste_records_new ADD COLUMN {column_name} FLOAT DEFAULT 0'))
+        print(f"Column '{column_name}' added successfully.")
+    else:
+        print(f"Column '{column_name}' already exists.")

@@ -14,7 +14,7 @@
     <h2 class="mt-4 mb-3" style="font-size: 1.5rem;">Log Waste Data for {{ selected_date }}</h2>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <div class="alert alert-success">
+    <div class="flashes">
         {% for message in messages %}
         <p>{{ message }}</p>
         {% endfor %}
@@ -33,63 +33,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                     <!-- Original fields -->
-                     <tr>
-                        <td rowspan="2">Food</td>
-                        <td>Compost</td>
-                        <td><input type="text" class="form-control" name="food_compost" value="{{ record.food_compost if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td>NonCompost</td>
-                        <td><input type="text" class="form-control" name="food_noncompost" value="{{ record.food_noncompost if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td rowspan="4">Cardboard & Paper</td>
-                        <td>Cardboard</td>
-                        <td><input type="text" class="form-control" name="cardboard" value="{{ record.cardboard if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td>Mixed</td>
-                        <td><input type="text" class="form-control" name="paper_mixed" value="{{ record.paper_mixed if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td>Newsprint</td>
-                        <td><input type="text" class="form-control" name="paper_newspaper" value="{{ record.paper_newspaper if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td>White</td>
-                        <td><input type="text" class="form-control" name="paper_white" value="{{ record.paper_white if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td rowspan="3">Plastic</td>
-                        <td>#1 PET</td>
-                        <td><input type="text" class="form-control" name="plastic_pet" value="{{ record.plastic_pet if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td>#2 Natural</td>
-                        <td><input type="text" class="form-control" name="plastic_natural" value="{{ record.plastic_natural if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td>#2 Color</td>
-                        <td><input type="text" class="form-control" name="plastic_colored" value="{{ record.plastic_colored if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td rowspan="2">Metal</td>
-                        <td>Aluminum</td>
-                        <td><input type="text" class="form-control" name="aluminum" value="{{ record.aluminum if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td>Other</td>
-                        <td><input type="text" class="form-control" name="metal_other" value="{{ record.metal_other if record else '' }}"></td>
-                     </tr>
-                     <tr>
-                        <td>Glass</td>
-                        <td>Glass</td>
-                        <td><input type="text" class="form-control" name="glass" value="{{ record.glass if record else '' }}"></td>
-                     </tr>
                      <!-- Dynamic fields for new categories -->
                      {% for category in categories %}
-                     {% if category.name not in ['Food', 'Cardboard & Paper', 'Plastic', 'Metal', 'Glass'] %}
+                     <!-- {% if category.name not in ['Food', 'Cardboard & Paper', 'Plastic', 'Metal', 'Glass'] %} -->
                      {% for subcategory in category.children %}
                      <tr>
                         {% if loop.first %}
@@ -97,7 +43,7 @@
                         {% endif %}
                         <td>{{ subcategory.name }}</td>
                         <td>
-                           {% set field_name = (category.name|lower + '_' + subcategory.name|lower)|replace(' ', '_') %}
+                           {% set field_name = (category.name + '_' + subcategory.name)|replace(' ', '_') %}
                            <input type="text" class="form-control" name="{{ field_name }}" 
                               value="{{ record|get_attribute(field_name) if record else '' }}">
                         </td>
@@ -105,7 +51,7 @@
                      {% endfor %}
                      {% endif %}
                      {% endfor %}
-                  </tbody>
+                </tbody>
             </table>
         </div>
         <div class="d-flex justify-content-start mt-3">
